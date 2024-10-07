@@ -73,7 +73,7 @@ const phases = [
 ];
 
 const Rhythm = () => {
-  const [selectedPhase, setSelectedPhase] = useState(phases[5]);
+  const [selectedPhase, setSelectedPhase] = useState(phases[0]);
   const [cardPosition, setCardPosition] = useState(0);
   const curveRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);

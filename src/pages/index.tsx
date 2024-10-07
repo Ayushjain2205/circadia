@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Layout from "@/components/Layout";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -17,7 +17,8 @@ export default function Home() {
     return <LoadingScreen />;
   }
 
-  return <DummyHomepage />;
+  // navigate to /home
+  router.push("/home");
 }
 
 function LoadingScreen() {
@@ -35,15 +36,5 @@ function LoadingScreen() {
       </div>
       <h1 className="text-3xl font-bold text-[#7B2CBF]">Circadia</h1>
     </div>
-  );
-}
-
-function DummyHomepage() {
-  return (
-    <Layout>
-      <div className="min-h-screen bg-white text-[#1A2B4C]">
-        {/* ... (keep the existing content) */}
-      </div>
-    </Layout>
   );
 }

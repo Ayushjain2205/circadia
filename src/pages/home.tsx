@@ -61,7 +61,7 @@ export default function HomePage() {
 
   return (
     <Layout>
-      <main className="flex-1 p-4 pb-24">
+      <div className="flex-1 p-4 pb-24">
         {/* Overall Wellness Score */}
         <Card className="mb-6 border-none shadow-lg bg-gradient-to-r from-[#7B2CBF] to-[#E2CFEA]">
           <CardContent className="flex flex-col items-center justify-center p-6">
@@ -148,7 +148,7 @@ export default function HomePage() {
             </Button>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </Layout>
   );
 }

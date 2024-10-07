@@ -19,10 +19,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
         <div className="flex justify-around items-center h-20">
           <NavItem
-            href="/"
+            href="/home"
             icon={<Home className="w-6 h-6" />}
             label="Home"
-            isActive={isActive("/")}
+            isActive={isActive("/home")}
           />
           <NavItem
             href="/sleep"
@@ -30,10 +30,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             label="Sleep"
             isActive={isActive("/sleep")}
           />
-          <Link href="/askAi" className="relative -top-6">
-            <Button className="rounded-full bg-[#7B2CBF] text-white hover:bg-[#E2CFEA] hover:text-[#7B2CBF] w-16 h-16 flex flex-col items-center justify-center shadow-lg">
+          <Link href="/askAi" className="relative ">
+            <Button className="rounded-full bg-[#7B2CBF] text-white hover:bg-[#E2CFEA] hover:text-[#7B2CBF] w-16 h-16 flex flex-col items-center justify-center ">
               <Brain className="w-8 h-8" />
-              <span className="text-xs mt-1">Ask AI</span>
             </Button>
           </Link>
           <NavItem

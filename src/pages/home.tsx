@@ -2,11 +2,17 @@ import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, ChevronRight, Coins } from "lucide-react";
+import { Brain, ChevronRight, Coins, ArrowUp, ArrowDown } from "lucide-react";
 import Image from "next/image";
 
 type ScoreType = "sleep" | "activity" | "health";
-type Metric = { name: string; value: number; unit: string };
+type Metric = {
+  name: string;
+  value: number;
+  unit: string;
+  emoji: string;
+  trend: "up" | "down" | "neutral";
+};
 
 interface ScoreData {
   score: number;
@@ -20,23 +26,59 @@ export default function HomePage() {
     sleep: {
       score: 80,
       metrics: [
-        { name: "Sleep Debt", value: 1.5, unit: "hours" },
-        { name: "Deep Sleep", value: 2.3, unit: "hours" },
-        { name: "Time Slept", value: 7.5, unit: "hours" },
+        {
+          name: "Sleep Debt",
+          value: 1.5,
+          unit: "hours",
+          emoji: "💤",
+          trend: "down",
+        },
+        {
+          name: "Deep Sleep",
+          value: 2.3,
+          unit: "hours",
+          emoji: "🌙",
+          trend: "up",
+        },
+        {
+          name: "Time Slept",
+          value: 7.5,
+          unit: "hours",
+          emoji: "⏰",
+          trend: "neutral",
+        },
       ],
     },
     activity: {
       score: 75,
       metrics: [
-        { name: "Steps", value: 8500, unit: "steps" },
-        { name: "Physical Activity", value: 45, unit: "minutes" },
+        { name: "Steps", value: 8500, unit: "steps", emoji: "👣", trend: "up" },
+        {
+          name: "Physical Activity",
+          value: 45,
+          unit: "minutes",
+          emoji: "🏋️‍♂️",
+          trend: "up",
+        },
       ],
     },
     health: {
       score: 90,
       metrics: [
-        { name: "Heart Health", value: 95, unit: "%" },
-        { name: "Resting Heart Rate", value: 62, unit: "bpm" },
+        {
+          name: "Heart Health",
+          value: 95,
+          unit: "%",
+          emoji: "❤️",
+          trend: "up",
+        },
+        {
+          name: "Resting Heart Rate",
+          value: 62,
+          unit: "bpm",
+          emoji: "💓",
+          trend: "down",
+        },
       ],
     },
   });
@@ -49,6 +91,12 @@ export default function HomePage() {
     if (score >= 70) return "🙂";
     if (score >= 60) return "😐";
     return "😟";
+  };
+
+  const getTrendArrow = (trend: "up" | "down" | "neutral") => {
+    if (trend === "up") return <ArrowUp className="w-4 h-4 text-green-500" />;
+    if (trend === "down") return <ArrowDown className="w-4 h-4 text-red-500" />;
+    return null;
   };
 
   return (
@@ -127,9 +175,15 @@ export default function HomePage() {
                     key={index}
                     className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
                   >
-                    <span>{metric.name}</span>
-                    <span className="font-semibold text-[#7B2CBF]">
+                    <span className="flex items-center">
+                      <span className="mr-2">{metric.emoji}</span>
+                      {metric.name}
+                    </span>
+                    <span className="font-semibold text-[#7B2CBF] flex items-center">
                       {metric.value} {metric.unit}
+                      <span className="ml-2">
+                        {getTrendArrow(metric.trend)}
+                      </span>
                     </span>
                   </li>
                 ))}

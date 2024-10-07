@@ -117,7 +117,7 @@ export default function HomePage() {
         </div>
 
         {/* Overall Wellness Score */}
-        <Card className="mb-6 border-none shadow-lg bg-gradient-to-r from-[#7B2CBF] to-[#E2CFEA]">
+        <Card className="mb-6 border-none shadow-lg bg-[#7B2CBF] ">
           <CardContent className="flex flex-col items-center justify-center p-6">
             <h2 className="text-2xl font-semibold mb-2 text-white">
               Circadian Score

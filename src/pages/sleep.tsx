@@ -16,13 +16,13 @@ const Sleep = () => {
   };
 
   const weeklyData = [
-    { day: "M", sleep: 7.2 },
-    { day: "T", sleep: 6.8 },
-    { day: "W", sleep: 7.5 },
-    { day: "T", sleep: 6.5 },
-    { day: "F", sleep: 7.0 },
-    { day: "S", sleep: 8.2 },
-    { day: "S", sleep: 7.8 },
+    { day: "M", sleep: 7.2, deep: 0.7, light: 5.8, awake: 0.7 },
+    { day: "T", sleep: 6.8, deep: 0.5, light: 5.6, awake: 0.7 },
+    { day: "W", sleep: 7.5, deep: 0.8, light: 6.0, awake: 0.7 },
+    { day: "T", sleep: 6.5, deep: 0.6, light: 5.3, awake: 0.6 },
+    { day: "F", sleep: 7.0, deep: 0.7, light: 5.7, awake: 0.6 },
+    { day: "S", sleep: 8.2, deep: 1.0, light: 6.5, awake: 0.7 },
+    { day: "S", sleep: 7.8, deep: 0.9, light: 6.2, awake: 0.7 },
   ];
 
   const [selectedSleepStage, setSelectedSleepStage] = useState<string | null>(
@@ -190,19 +190,55 @@ const Sleep = () => {
         <Card>
           <CardContent className="p-4">
             <div className="text-lg font-semibold mb-4">Weekly Sleep</div>
-            <div className="flex justify-between items-end h-40">
+            <div className="flex justify-between items-end h-48 px-2">
               {weeklyData.map((day, index) => (
                 <div key={index} className="flex flex-col items-center">
-                  <div className="relative w-8 bg-gray-200 rounded-t-full overflow-hidden">
+                  <div
+                    className="relative w-6 bg-gray-100 rounded-lg overflow-hidden"
+                    style={{ height: "160px" }}
+                  >
                     <div
-                      className="absolute bottom-0 w-full bg-[#7B2CBF] rounded-t-full"
-                      style={{ height: `${(day.sleep / 10) * 100}%` }}
+                      className="absolute bottom-0 left-0 right-0 bg-[#7B2CBF]  "
+                      style={{
+                        height: `${(day.deep / day.sleep) * 160}px`,
+                        borderBottomLeftRadius: "1rem",
+                        borderBottomRightRadius: "1rem",
+                      }}
+                    ></div>
+                    <div
+                      className="absolute left-0 right-0 bg-[#C77DFF]"
+                      style={{
+                        height: `${(day.light / day.sleep) * 160}px`,
+                        bottom: `${(day.deep / day.sleep) * 160}px`,
+                      }}
+                    ></div>
+                    <div
+                      className="absolute top-0 left-0 right-0 bg-red-400 rounded-t-lg"
+                      style={{
+                        height: `${(day.awake / day.sleep) * 160}px`,
+                        borderTopLeftRadius: "1rem",
+                        borderTopRightRadius: "1rem",
+                      }}
                     ></div>
                   </div>
                   <div className="mt-2 text-xs">{day.day}</div>
                   <div className="text-xs font-semibold">{day.sleep}h</div>
                 </div>
               ))}
+            </div>
+            <div className="flex justify-center mt-4 space-x-4">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-[#7B2CBF] rounded-full mr-1"></div>
+                <span className="text-xs">Deep</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-[#C77DFF] rounded-full mr-1"></div>
+                <span className="text-xs">Light</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-red-400 rounded-full mr-1"></div>
+                <span className="text-xs">Awake</span>
+              </div>
             </div>
           </CardContent>
         </Card>

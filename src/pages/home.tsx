@@ -1,8 +1,8 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Brain, ChevronRight, Coins, ArrowUp, ArrowDown } from "lucide-react";
+
+import { User, ArrowUp, ArrowDown } from "lucide-react";
 import Image from "next/image";
 
 type ScoreType = "sleep" | "activity" | "health";
@@ -103,7 +103,10 @@ export default function HomePage() {
     <Layout>
       <div className="flex-1 p-4 pb-24">
         {/* Coin Count */}
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-between mb-4">
+          <div className="inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full p-2">
+            <User className="w-6 h-6" />
+          </div>
           <div className="inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full py-1 px-3">
             <Image
               src="/coin.svg"
@@ -191,23 +194,6 @@ export default function HomePage() {
             </CardContent>
           </Card>
         )}
-
-        {/* AI Insights */}
-        {/* <Card className="mb-6 border-2 border-[#7B2CBF]">
-          <CardContent className="p-4">
-            <h3 className="text-xl font-semibold mb-2 text-[#7B2CBF] flex items-center">
-              <Brain className="w-6 h-6 mr-2" /> AI Insights
-            </h3>
-            <p className="text-sm mb-2">
-              Your sleep pattern shows improvement. Consider going to bed 15
-              minutes earlier to optimize your circadian rhythm.
-            </p>
-            <Button className="w-full mt-2 bg-[#7B2CBF] text-white hover:bg-[#E2CFEA] hover:text-[#7B2CBF]">
-              View Detailed Analysis
-              <ChevronRight className="w-4 h-4 ml-2" />
-            </Button>
-          </CardContent>
-        </Card> */}
       </div>
     </Layout>
   );

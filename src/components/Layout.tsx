@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Home, Moon, Activity, User, Brain } from "lucide-react";
+import { Home, Moon, Activity, Footprints, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LayoutProps {
@@ -36,16 +36,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </Button>
           </Link>
           <NavItem
-            href="/activity"
+            href="/rhythm"
             icon={<Activity className="w-6 h-6" />}
             label="Rhythm"
-            isActive={isActive("/activity")}
+            isActive={isActive("/rhythm")}
           />
           <NavItem
-            href="/profile"
-            icon={<User className="w-6 h-6" />}
-            label="Profile"
-            isActive={isActive("/profile")}
+            href="/activity"
+            icon={<Footprints className="w-6 h-6" />}
+            label="Activity"
+            isActive={isActive("/activity")}
           />
         </div>
       </nav>

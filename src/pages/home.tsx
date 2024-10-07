@@ -1,3 +1,4 @@
+import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,7 +60,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white font-poppins text-gray-800">
+    <Layout>
       <main className="flex-1 p-4 pb-24">
         {/* Overall Wellness Score */}
         <Card className="mb-6 border-none shadow-lg bg-gradient-to-r from-[#7B2CBF] to-[#E2CFEA]">
@@ -148,37 +149,6 @@ export default function HomePage() {
           </CardContent>
         </Card>
       </main>
-
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
-        <div className="flex justify-around items-center h-16">
-          <Link href="/" className="text-[#7B2CBF]">
-            <Home className="w-6 h-6" />
-          </Link>
-          <Link
-            href="/sleep"
-            className="text-gray-400 hover:text-[#7B2CBF] transition-colors"
-          >
-            <Moon className="w-6 h-6" />
-          </Link>
-          <Button className="rounded-full bg-[#7B2CBF] text-white hover:bg-[#E2CFEA] hover:text-[#7B2CBF] -mt-8 w-14 h-14 flex items-center justify-center shadow-lg">
-            <Brain className="w-8 h-8" />
-            <span className="sr-only">Ask AI</span>
-          </Button>
-          <Link
-            href="/activity"
-            className="text-gray-400 hover:text-[#7B2CBF] transition-colors"
-          >
-            <Activity className="w-6 h-6" />
-          </Link>
-          <Link
-            href="/profile"
-            className="text-gray-400 hover:text-[#7B2CBF] transition-colors"
-          >
-            <User className="w-6 h-6" />
-          </Link>
-        </div>
-      </nav>
-    </div>
+    </Layout>
   );
 }

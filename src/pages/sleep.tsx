@@ -1,18 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
 const Sleep = () => {
   const sleepData = {
-    sleepDebt: 9.5, // in hours
-    sleepDebtDelta: 0.5, // increase of 0.5 hours since yesterday
-    deepRatio: 10,
-    shallowRatio: 86,
-    awakeRatio: 4,
+    sleepDebt: 2.5,
+    sleepDebtDelta: 0.5,
+    deepSleep: 10,
+    lightSleep: 86,
+    awake: 4,
     sumDuration: 431,
   };
 
@@ -26,10 +25,14 @@ const Sleep = () => {
     { day: "S", sleep: 7.8 },
   ];
 
+  const [selectedSleepStage, setSelectedSleepStage] = useState<string | null>(
+    null
+  );
+
   const getSleepDebtEmoji = (debt: number) => {
     if (debt <= 0) return "😊";
-    if (debt <= 4) return "😐";
-    if (debt <= 8) return "😴";
+    if (debt <= 1) return "😐";
+    if (debt <= 3) return "😴";
     return "😫";
   };
 
@@ -55,12 +58,54 @@ const Sleep = () => {
     );
   };
 
+  const avgSleepDuration = Math.round(sleepData.sumDuration / 60);
+
+  const handleSleepStageClick = (stage: string) => {
+    setSelectedSleepStage(stage === selectedSleepStage ? null : stage);
+  };
+
+  const getSleepStageInfo = (stage: string) => {
+    switch (stage) {
+      case "deep":
+        return {
+          name: "Deep Sleep",
+          emoji: "😴",
+          percentage: sleepData.deepSleep,
+          duration: ((avgSleepDuration * sleepData.deepSleep) / 100).toFixed(1),
+          color: "bg-[#7B2CBF]",
+          textColor: "text-[#7B2CBF]",
+        };
+      case "light":
+        return {
+          name: "Light Sleep",
+          emoji: "🥱",
+          percentage: sleepData.lightSleep,
+          duration: ((avgSleepDuration * sleepData.lightSleep) / 100).toFixed(
+            1
+          ),
+          color: "bg-[#C77DFF]",
+          textColor: "text-[#C77DFF]",
+        };
+      case "awake":
+        return {
+          name: "Awake",
+          emoji: "🫣",
+          percentage: sleepData.awake,
+          duration: ((avgSleepDuration * sleepData.awake) / 100).toFixed(1),
+          color: "bg-red-400",
+          textColor: "text-red-400",
+        };
+      default:
+        return null;
+    }
+  };
+
   return (
     <Layout>
       <div className="flex-1 p-4 pb-24 space-y-6">
         {/* Sleep Debt Card */}
         <div className="flex justify-center">
-          <Card className="w-64 h-64 border-none shadow-lg overflow-hidden bg-[#7B2CBF] ">
+          <Card className="w-64 h-64 border-none shadow-lg overflow-hidden bg-[#7B2CBF]">
             <CardContent className="p-4 flex flex-col items-center justify-between h-full text-white">
               <div className="text-lg font-semibold">Sleep Debt</div>
               <div className="text-center">
@@ -83,47 +128,61 @@ const Sleep = () => {
         {/* Sleep Quality Card */}
         <Card>
           <CardContent className="p-4">
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-lg font-semibold">Sleep Quality</div>
+            <div className="flex justify-between items-center mb-4">
+              <div className="text-lg font-semibold">Avg Sleep</div>
               <div className="text-2xl font-bold text-[#7B2CBF]">
-                {Math.round(sleepData.sumDuration / 60)}h
+                {avgSleepDuration}h
               </div>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center">
-                <div className="w-20 text-sm">Deep</div>
-                <Progress
-                  value={sleepData.deepRatio}
-                  className="flex-1 h-2"
-                  indicatorClassName="bg-[#7B2CBF]"
-                />
-                <div className="w-12 text-right text-sm">
-                  {sleepData.deepRatio}%
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="w-20 text-sm">Light</div>
-                <Progress
-                  value={sleepData.shallowRatio}
-                  className="flex-1 h-2"
-                  indicatorClassName="bg-[#9D4EDD]"
-                />
-                <div className="w-12 text-right text-sm">
-                  {sleepData.shallowRatio}%
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="w-20 text-sm">Awake</div>
-                <Progress
-                  value={sleepData.awakeRatio}
-                  className="flex-1 h-2"
-                  indicatorClassName="bg-[#C77DFF]"
-                />
-                <div className="w-12 text-right text-sm">
-                  {sleepData.awakeRatio}%
-                </div>
-              </div>
+            <div className="flex h-8 w-full rounded-full overflow-hidden mb-4">
+              {["deep", "light", "awake"].map((stage) => {
+                const info = getSleepStageInfo(stage);
+                return (
+                  <button
+                    key={stage}
+                    className={`h-full transition-all duration-300 ${
+                      selectedSleepStage === stage
+                        ? "ring-2 ring-offset-2 ring-[#7B2CBF]"
+                        : ""
+                    }`}
+                    style={{ width: `${info?.percentage}%` }}
+                    onClick={() => handleSleepStageClick(stage)}
+                  >
+                    <div className={`h-full w-full ${info?.color}`}></div>
+                  </button>
+                );
+              })}
             </div>
+            <div className="flex justify-between">
+              {["deep", "light", "awake"].map((stage) => {
+                const info = getSleepStageInfo(stage);
+                return (
+                  <div
+                    key={stage}
+                    className={`text-center ${
+                      selectedSleepStage === stage
+                        ? `${info?.textColor} font-bold`
+                        : "text-gray-500"
+                    }`}
+                  >
+                    <div className="text-sm">{info?.percentage}%</div>
+                    <div className="text-xs">{info?.duration}h</div>
+                  </div>
+                );
+              })}
+            </div>
+            {selectedSleepStage && (
+              <div className="mt-4 text-center">
+                <p className="font-semibold text-lg">
+                  {getSleepStageInfo(selectedSleepStage)?.name}{" "}
+                  {getSleepStageInfo(selectedSleepStage)?.emoji}
+                </p>
+                <p className="text-sm">
+                  {getSleepStageInfo(selectedSleepStage)?.percentage}% -{" "}
+                  {getSleepStageInfo(selectedSleepStage)?.duration}h
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

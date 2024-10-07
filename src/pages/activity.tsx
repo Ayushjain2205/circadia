@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Layout from "@/components/Layout";
 import {
   Moon,
@@ -18,50 +18,82 @@ import { Card, CardContent } from "@/components/ui/card";
 const phases = [
   {
     time: "2 AM",
-    icon: <Moon className="w-6 h-6 text-white" />,
+    icon: <Moon className="w-6 h-6" />,
     title: "Deep Sleep",
     description: "Restorative sleep phase",
     color: "bg-blue-400",
+    borderColor: "border-blue-400",
+    textColor: "text-blue-400",
   },
   {
     time: "6 AM",
-    icon: <Sun className="w-6 h-6 text-black" />,
+    icon: <Sun className="w-6 h-6" />,
     title: "Wake Up",
     description: "Natural wake-up time",
     color: "bg-yellow-400",
+    borderColor: "border-yellow-400",
+    textColor: "text-yellow-400",
   },
   {
     time: "10 AM",
-    icon: <Coffee className="w-6 h-6 text-white" />,
+    icon: <Coffee className="w-6 h-6" />,
     title: "Peak Alertness",
     description: "High cortisol, good for focused work",
     color: "bg-green-400",
+    borderColor: "border-green-400",
+    textColor: "text-green-400",
   },
   {
     time: "2 PM",
-    icon: <Brain className="w-6 h-6 text-white" />,
+    icon: <Brain className="w-6 h-6" />,
     title: "Peak Cognition",
     description: "Best time for critical thinking",
     color: "bg-purple-400",
+    borderColor: "border-purple-400",
+    textColor: "text-purple-400",
   },
   {
     time: "6 PM",
-    icon: <Zap className="w-6 h-6 text-white" />,
+    icon: <Zap className="w-6 h-6" />,
     title: "Fastest Reactions",
     description: "Highest physical performance",
     color: "bg-red-400",
+    borderColor: "border-red-400",
+    textColor: "text-red-400",
   },
   {
     time: "10 PM",
-    icon: <BedDouble className="w-6 h-6 text-white" />,
+    icon: <BedDouble className="w-6 h-6" />,
     title: "Melatonin Release",
     description: "Body prepares for sleep",
     color: "bg-indigo-400",
+    borderColor: "border-indigo-400",
+    textColor: "text-indigo-400",
   },
 ];
 
 const Rhythm = () => {
   const [selectedPhase, setSelectedPhase] = useState(phases[5]);
+  const [cardPosition, setCardPosition] = useState(0);
+  const curveRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (curveRef.current && cardRef.current) {
+      const index = phases.findIndex((phase) => phase === selectedPhase);
+      const totalHeight = curveRef.current.clientHeight;
+      const cardHeight = cardRef.current.clientHeight;
+      const maxPosition = totalHeight - cardHeight;
+      const newPosition = Math.min(
+        Math.max(
+          (index / (phases.length - 1)) * totalHeight - cardHeight / 2,
+          0
+        ),
+        maxPosition
+      );
+      setCardPosition(newPosition);
+    }
+  }, [selectedPhase]);
 
   return (
     <Layout>
@@ -69,7 +101,7 @@ const Rhythm = () => {
         <h1 className="text-xl font-bold mb-6">Circadian Rhythm Journey</h1>
 
         <div className="w-full max-w-md flex mt-8 mb-8">
-          <div className="w-1/3 relative mr-4">
+          <div className="w-1/2 relative mr-4" ref={curveRef}>
             <svg viewBox="0 0 100 300" className="w-full h-full">
               <path
                 d="M50,0 C30,60 70,120 50,180 C30,240 70,300 50,300"
@@ -106,35 +138,40 @@ const Rhythm = () => {
                 }}
                 onClick={() => setSelectedPhase(phase)}
               >
-                {phase.icon}
+                {React.cloneElement(phase.icon, {
+                  className: "w-6 h-6 text-white",
+                })}
               </button>
             ))}
           </div>
 
-          <div className="w-2/3">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center mb-2">
-                  {selectedPhase.icon}
-                  <h2 className="text-xl font-semibold ml-2">
-                    {selectedPhase.title}
-                  </h2>
-                </div>
-                <span className="text-sm text-gray-500 block mb-2">
-                  {selectedPhase.time}
-                </span>
-                <p className="text-sm text-gray-600 mb-4">
-                  {selectedPhase.description}
-                </p>
-
-                {/* <h3 className="text-lg font-semibold mb-2">Tips</h3>
-                <ul className="text-sm text-gray-600 list-disc list-inside">
-                  <li>Align activities with your body's rhythm</li>
-                  <li>Maintain a consistent sleep schedule</li>
-                  <li>Expose yourself to natural light during the day</li>
-                </ul> */}
-              </CardContent>
-            </Card>
+          <div className="w-2/3 relative">
+            <div
+              ref={cardRef}
+              className="absolute transition-all duration-300 ease-in-out"
+              style={{ top: `${cardPosition}px` }}
+            >
+              <Card className={`border-2 ${selectedPhase.borderColor}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center mb-2">
+                    {React.cloneElement(selectedPhase.icon, {
+                      className: `w-6 h-6 ${selectedPhase.textColor}`,
+                    })}
+                    <h2
+                      className={`text-xl font-semibold ml-2 ${selectedPhase.textColor}`}
+                    >
+                      {selectedPhase.title}
+                    </h2>
+                  </div>
+                  <span className="text-sm text-gray-500 block mb-2">
+                    {selectedPhase.time}
+                  </span>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {selectedPhase.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
 

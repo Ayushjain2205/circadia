@@ -38,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <NavItem
             href="/activity"
             icon={<Activity className="w-6 h-6" />}
-            label="Activity"
+            label="Rhythm"
             isActive={isActive("/activity")}
           />
           <NavItem

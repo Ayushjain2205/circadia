@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "@/components/Layout";
 
-const Sleep = () => {
+const Profile = () => {
   return (
     <Layout>
       <div>Sleep</div>
@@ -9,4 +9,4 @@ const Sleep = () => {
   );
 };
 
-export default Sleep;
+export default Profile;

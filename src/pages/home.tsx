@@ -2,17 +2,8 @@ import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Home,
-  Moon,
-  Activity,
-  User,
-  Brain,
-  ChevronRight,
-  Heart,
-  Zap,
-} from "lucide-react";
-import Link from "next/link";
+import { Brain, ChevronRight, Coins } from "lucide-react";
+import Image from "next/image";
 
 type ScoreType = "sleep" | "activity" | "health";
 type Metric = { name: string; value: number; unit: string };
@@ -24,6 +15,7 @@ interface ScoreData {
 
 export default function HomePage() {
   const [overallScore, setOverallScore] = useState(85);
+  const [coinCount, setCoinCount] = useState(230);
   const [scores, setScores] = useState<Record<ScoreType, ScoreData>>({
     sleep: {
       score: 80,
@@ -62,11 +54,25 @@ export default function HomePage() {
   return (
     <Layout>
       <div className="flex-1 p-4 pb-24">
+        {/* Coin Count */}
+        <div className="flex justify-end mb-4">
+          <div className="inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full py-1 px-3">
+            <Image
+              src="/coin.svg"
+              alt="Coins"
+              className="mr-1"
+              width={30}
+              height={30}
+            />
+            <span className="text-sm font-semibold">{coinCount}</span>
+          </div>
+        </div>
+
         {/* Overall Wellness Score */}
         <Card className="mb-6 border-none shadow-lg bg-gradient-to-r from-[#7B2CBF] to-[#E2CFEA]">
           <CardContent className="flex flex-col items-center justify-center p-6">
             <h2 className="text-2xl font-semibold mb-2 text-white">
-              Wellness AI Score
+              Circadian Score
             </h2>
             <div className="text-7xl font-bold text-white flex items-center">
               {overallScore} {getScoreEmoji(overallScore)}
@@ -133,7 +139,7 @@ export default function HomePage() {
         )}
 
         {/* AI Insights */}
-        <Card className="mb-6 border-2 border-[#7B2CBF]">
+        {/* <Card className="mb-6 border-2 border-[#7B2CBF]">
           <CardContent className="p-4">
             <h3 className="text-xl font-semibold mb-2 text-[#7B2CBF] flex items-center">
               <Brain className="w-6 h-6 mr-2" /> AI Insights
@@ -147,7 +153,7 @@ export default function HomePage() {
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </Layout>
   );

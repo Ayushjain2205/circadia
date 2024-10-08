@@ -30,74 +30,44 @@ interface ScoreData {
   metrics: Metric[];
 }
 
+interface OverallData {
+  overallScore: number;
+  coinCount: number;
+  scores: Record<ScoreType, ScoreData>;
+}
+
 export default function HomePage() {
-  const [overallScore, setOverallScore] = useState(85);
-  const [coinCount, setCoinCount] = useState(230);
+  const [overallScore, setOverallScore] = useState(0);
+  const [coinCount, setCoinCount] = useState(0);
   const [scores, setScores] = useState<Record<ScoreType, ScoreData>>({
-    sleep: {
-      score: 80,
-      metrics: [
-        {
-          name: "Sleep Debt",
-          value: 1.5,
-          unit: "hours",
-          emoji: "💤",
-          trend: "down",
-        },
-        {
-          name: "Deep Sleep",
-          value: 2.3,
-          unit: "hours",
-          emoji: "🌙",
-          trend: "up",
-        },
-        {
-          name: "Time Slept",
-          value: 7.5,
-          unit: "hours",
-          emoji: "⏰",
-          trend: "neutral",
-        },
-      ],
-    },
-    activity: {
-      score: 75,
-      metrics: [
-        { name: "Steps", value: 8500, unit: "steps", emoji: "👣", trend: "up" },
-        {
-          name: "Physical Activity",
-          value: 45,
-          unit: "minutes",
-          emoji: "🏋️‍♂️",
-          trend: "up",
-        },
-      ],
-    },
-    health: {
-      score: 90,
-      metrics: [
-        {
-          name: "Heart Health",
-          value: 95,
-          unit: "%",
-          emoji: "❤️",
-          trend: "up",
-        },
-        {
-          name: "Resting Heart Rate",
-          value: 62,
-          unit: "bpm",
-          emoji: "💓",
-          trend: "down",
-        },
-      ],
-    },
+    sleep: { score: 0, metrics: [] },
+    activity: { score: 0, metrics: [] },
+    health: { score: 0, metrics: [] },
   });
 
   const [selectedScore, setSelectedScore] = useState<ScoreType | null>(null);
   const [isGlowing, setIsGlowing] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [isClaimed, setIsClaimed] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/overall-data");
+        const data: OverallData = await response.json();
+        setOverallScore(data.overallScore);
+        setCoinCount(data.coinCount);
+        setScores(data.scores);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const glowInterval = setInterval(() => {
@@ -137,6 +107,16 @@ export default function HomePage() {
       origin: { y: 0.6 },
     });
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex-1 p-4 flex items-center justify-center">
+          <p>Loading...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

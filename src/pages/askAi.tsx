@@ -5,6 +5,8 @@ import Layout from "@/components/Layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   id: number;
@@ -26,7 +28,7 @@ const AskAI = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === "") return;
 
     const newMessage: Message = {
@@ -39,16 +41,37 @@ const AskAI = () => {
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/ask-ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: input }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch");
+      }
+
+      const data = await response.json();
       const aiResponse: Message = {
         id: Date.now(),
-        text: `Here's a response to "${input}"`,
+        text: data.message,
         sender: "ai",
       };
       setMessages((prev) => [...prev, aiResponse]);
+    } catch (error) {
+      console.error("Error fetching AI response:", error);
+      const errorMessage: Message = {
+        id: Date.now(),
+        text: "I'm sorry, I couldn't process your request at the moment. Please try again later.",
+        sender: "ai",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -82,7 +105,12 @@ const AskAI = () => {
                     <span className="font-semibold">Circadia AI</span>
                   </div>
                 )}
-                <p>{message.text}</p>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  className="markdown-content"
+                >
+                  {message.text}
+                </ReactMarkdown>
               </div>
             </div>
           ))}

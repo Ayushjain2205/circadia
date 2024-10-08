@@ -5,3 +5,59 @@
 body {
   font-family: "Poppins", sans-serif;
 }
+
+/* Add this to your existing CSS file */
+
+.markdown-content {
+  @apply text-left;
+}
+
+.markdown-content h1 {
+  @apply text-2xl font-bold mb-2;
+}
+
+.markdown-content h2 {
+  @apply text-xl font-bold mb-2;
+}
+
+.markdown-content h3 {
+  @apply text-lg font-bold mb-2;
+}
+
+.markdown-content p {
+  @apply mb-2;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  @apply ml-4 mb-2;
+}
+
+.markdown-content li {
+  @apply mb-1;
+}
+
+.markdown-content code {
+  @apply bg-gray-100 rounded px-1;
+}
+
+.markdown-content pre {
+  @apply bg-gray-100 rounded p-2 mb-2 overflow-x-auto;
+}
+
+.markdown-content a {
+  @apply text-blue-600 underline;
+}
+
+.markdown-content blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic;
+}
+
+.markdown-content table {
+  @apply border-collapse border border-gray-300 mb-2;
+}
+
+.markdown-content th,
+.markdown-content td {
+  @apply border border-gray-300 p-2;
+}

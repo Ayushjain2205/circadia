@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SleepData {
   sleepDebt: number;
@@ -28,6 +29,7 @@ const Sleep = () => {
   const [selectedSleepStage, setSelectedSleepStage] = useState<string | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchSleepData = async () => {
@@ -38,19 +40,13 @@ const Sleep = () => {
         setWeeklyData(data.weeklyData);
       } catch (error) {
         console.error("Error fetching sleep data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchSleepData();
   }, []);
-
-  if (!sleepData) {
-    return (
-      <Layout>
-        <div>Loading...</div>
-      </Layout>
-    );
-  }
 
   const getSleepDebtEmoji = (debt: number) => {
     if (debt <= 0) return "😊";
@@ -81,13 +77,16 @@ const Sleep = () => {
     );
   };
 
-  const avgSleepDuration = Math.round(sleepData.sumDuration / 60);
+  const avgSleepDuration = sleepData
+    ? Math.round(sleepData.sumDuration / 60)
+    : 0;
 
   const handleSleepStageClick = (stage: string) => {
     setSelectedSleepStage(stage === selectedSleepStage ? null : stage);
   };
 
   const getSleepStageInfo = (stage: string) => {
+    if (!sleepData) return null;
     switch (stage) {
       case "deep":
         return {
@@ -131,19 +130,27 @@ const Sleep = () => {
           <Card className="w-64 h-64 border-none shadow-lg overflow-hidden bg-[#7B2CBF]">
             <CardContent className="p-4 flex flex-col items-center justify-between h-full text-white">
               <div className="text-lg font-semibold">Sleep Debt</div>
-              <div className="text-center">
-                <div className="text-6xl font-bold flex items-center justify-center">
-                  <span>{sleepData.sleepDebt.toFixed(1)}</span>
-                  <span className="ml-2">
-                    {getSleepDebtEmoji(sleepData.sleepDebt)}
-                  </span>
+              {isLoading ? (
+                <Skeleton className="w-32 h-32 rounded-full bg-white/20" />
+              ) : (
+                <div className="text-center">
+                  <div className="text-6xl font-bold flex items-center justify-center">
+                    <span>{sleepData!.sleepDebt.toFixed(1)}</span>
+                    <span className="ml-2">
+                      {getSleepDebtEmoji(sleepData!.sleepDebt)}
+                    </span>
+                  </div>
+                  <div className="text-2xl">hrs</div>
                 </div>
-                <div className="text-2xl">hrs</div>
-              </div>
-              <div className="text-sm flex flex-col items-center">
-                <span className="mb-1">Since yesterday</span>
-                {getTrendArrow(sleepData.sleepDebtDelta)}
-              </div>
+              )}
+              {isLoading ? (
+                <Skeleton className="w-24 h-6 bg-white/20" />
+              ) : (
+                <div className="text-sm flex flex-col items-center">
+                  <span className="mb-1">Since yesterday</span>
+                  {getTrendArrow(sleepData!.sleepDebtDelta)}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -153,29 +160,37 @@ const Sleep = () => {
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-4">
               <div className="text-lg font-semibold">Avg Sleep</div>
-              <div className="text-2xl font-bold text-[#7B2CBF]">
-                {avgSleepDuration}h
+              {isLoading ? (
+                <Skeleton className="w-16 h-8" />
+              ) : (
+                <div className="text-2xl font-bold text-[#7B2CBF]">
+                  {avgSleepDuration}h
+                </div>
+              )}
+            </div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-full mb-4" />
+            ) : (
+              <div className="flex h-8 w-full rounded-full overflow-hidden mb-4">
+                {["deep", "light", "awake"].map((stage) => {
+                  const info = getSleepStageInfo(stage);
+                  return (
+                    <button
+                      key={stage}
+                      className={`h-full transition-all duration-300 ${
+                        selectedSleepStage === stage
+                          ? "ring-2 ring-offset-2 ring-[#7B2CBF]"
+                          : ""
+                      }`}
+                      style={{ width: `${info?.percentage}%` }}
+                      onClick={() => handleSleepStageClick(stage)}
+                    >
+                      <div className={`h-full w-full ${info?.color}`}></div>
+                    </button>
+                  );
+                })}
               </div>
-            </div>
-            <div className="flex h-8 w-full rounded-full overflow-hidden mb-4">
-              {["deep", "light", "awake"].map((stage) => {
-                const info = getSleepStageInfo(stage);
-                return (
-                  <button
-                    key={stage}
-                    className={`h-full transition-all duration-300 ${
-                      selectedSleepStage === stage
-                        ? "ring-2 ring-offset-2 ring-[#7B2CBF]"
-                        : ""
-                    }`}
-                    style={{ width: `${info?.percentage}%` }}
-                    onClick={() => handleSleepStageClick(stage)}
-                  >
-                    <div className={`h-full w-full ${info?.color}`}></div>
-                  </button>
-                );
-              })}
-            </div>
+            )}
             <div className="flex justify-between">
               {["deep", "light", "awake"].map((stage) => {
                 const info = getSleepStageInfo(stage);
@@ -188,13 +203,19 @@ const Sleep = () => {
                         : "text-gray-500"
                     }`}
                   >
-                    <div className="text-sm">{info?.percentage}%</div>
-                    <div className="text-xs">{info?.duration}h</div>
+                    {isLoading ? (
+                      <Skeleton className="w-12 h-8" />
+                    ) : (
+                      <>
+                        <div className="text-sm">{info?.percentage}%</div>
+                        <div className="text-xs">{info?.duration}h</div>
+                      </>
+                    )}
                   </div>
                 );
               })}
             </div>
-            {selectedSleepStage && (
+            {selectedSleepStage && !isLoading && (
               <div className="mt-4 text-center">
                 <p className="font-semibold text-lg">
                   {getSleepStageInfo(selectedSleepStage)?.name}{" "}
@@ -214,40 +235,44 @@ const Sleep = () => {
           <CardContent className="p-4">
             <div className="text-lg font-semibold mb-4">Weekly Sleep</div>
             <div className="flex justify-between items-end h-48 px-2">
-              {weeklyData.map((day, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <div
-                    className="relative w-6  rounded-lg overflow-hidden"
-                    style={{ height: "160px", borderRadius: "1rem" }}
-                  >
-                    <div
-                      className="absolute bottom-0 left-0 right-0 bg-[#7B2CBF]  "
-                      style={{
-                        height: `${(day.deep / day.sleep) * 160}px`,
-                        borderBottomLeftRadius: "1rem",
-                        borderBottomRightRadius: "1rem",
-                      }}
-                    ></div>
-                    <div
-                      className="absolute left-0 right-0 bg-[#C77DFF]"
-                      style={{
-                        height: `${(day.light / day.sleep) * 160}px`,
-                        bottom: `${(day.deep / day.sleep) * 160}px`,
-                      }}
-                    ></div>
-                    <div
-                      className="absolute top-0 left-0 right-0 bg-red-400 rounded-t-lg"
-                      style={{
-                        height: `${(day.awake / day.sleep) * 160}px`,
-                        borderTopLeftRadius: "1rem",
-                        borderTopRightRadius: "1rem",
-                      }}
-                    ></div>
-                  </div>
-                  <div className="mt-2 text-xs">{day.day}</div>
-                  <div className="text-xs font-semibold">{day.sleep}h</div>
-                </div>
-              ))}
+              {isLoading
+                ? Array.from({ length: 7 }).map((_, index) => (
+                    <Skeleton key={index} className="w-6 h-40" />
+                  ))
+                : weeklyData.map((day, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <div
+                        className="relative w-6 rounded-lg overflow-hidden"
+                        style={{ height: "160px", borderRadius: "1rem" }}
+                      >
+                        <div
+                          className="absolute bottom-0 left-0 right-0 bg-[#7B2CBF]"
+                          style={{
+                            height: `${(day.deep / day.sleep) * 160}px`,
+                            borderBottomLeftRadius: "1rem",
+                            borderBottomRightRadius: "1rem",
+                          }}
+                        ></div>
+                        <div
+                          className="absolute left-0 right-0 bg-[#C77DFF]"
+                          style={{
+                            height: `${(day.light / day.sleep) * 160}px`,
+                            bottom: `${(day.deep / day.sleep) * 160}px`,
+                          }}
+                        ></div>
+                        <div
+                          className="absolute top-0 left-0 right-0 bg-red-400 rounded-t-lg"
+                          style={{
+                            height: `${(day.awake / day.sleep) * 160}px`,
+                            borderTopLeftRadius: "1rem",
+                            borderTopRightRadius: "1rem",
+                          }}
+                        ></div>
+                      </div>
+                      <div className="mt-2 text-xs">{day.day}</div>
+                      <div className="text-xs font-semibold">{day.sleep}h</div>
+                    </div>
+                  ))}
             </div>
             <div className="flex justify-center mt-4 space-x-4">
               <div className="flex items-center">

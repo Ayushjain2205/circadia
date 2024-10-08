@@ -14,6 +14,7 @@ import {
   User,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type PhaseData = {
   time: string;
@@ -89,19 +90,26 @@ const Rhythm = () => {
   const [phases, setPhases] = useState<PhaseData[]>([]);
   const [selectedPhase, setSelectedPhase] = useState<PhaseData | null>(null);
   const [cardPosition, setCardPosition] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const curveRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchRhythmData = async () => {
-      const response = await fetch("/api/rhythm-data");
-      const data: { time: string }[] = await response.json();
-      const combinedData = data.map((item, index) => ({
-        ...item,
-        ...phaseConfigs[index],
-      }));
-      setPhases(combinedData);
-      setSelectedPhase(combinedData[0]);
+      try {
+        const response = await fetch("/api/rhythm-data");
+        const data: { time: string }[] = await response.json();
+        const combinedData = data.map((item, index) => ({
+          ...item,
+          ...phaseConfigs[index],
+        }));
+        setPhases(combinedData);
+        setSelectedPhase(combinedData[0]);
+      } catch (error) {
+        console.error("Error fetching rhythm data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchRhythmData();
@@ -124,14 +132,12 @@ const Rhythm = () => {
     }
   }, [selectedPhase, phases]);
 
-  if (phases.length === 0) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Layout>
       <div className="flex flex-col items-center p-4 bg-white text-gray-900 min-h-screen">
-        <h1 className="text-xl font-bold mb-6">Circadian Rhythm Journey</h1>
+        <h1 className="text-xl font-bold mb-6 text-[#7B2CBF]">
+          Circadian Rhythm Journey
+        </h1>
 
         <div className="w-full max-w-md flex mt-8 mb-8">
           <div className="w-1/2 relative mr-4" ref={curveRef}>
@@ -155,61 +161,76 @@ const Rhythm = () => {
               </defs>
             </svg>
 
-            {phases.map((phase, index) => {
-              const Icon = iconMap[phase.icon as keyof typeof iconMap];
-              return (
-                <button
-                  key={phase.time}
-                  className={`absolute transform -translate-x-1/2 -translate-y-1/2 rounded-full p-2 ${
-                    phase.color
-                  } ${
-                    selectedPhase === phase
-                      ? "ring-2 ring-offset-2 ring-gray-600"
-                      : ""
-                  }`}
-                  style={{
-                    left: "50%",
-                    top: `${(index / (phases.length - 1)) * 100}%`,
-                  }}
-                  onClick={() => setSelectedPhase(phase)}
-                >
-                  <Icon className="w-6 h-6 text-white" />
-                </button>
-              );
-            })}
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, index) => (
+                  <Skeleton
+                    key={index}
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2 rounded-full w-10 h-10"
+                    style={{
+                      left: "50%",
+                      top: `${(index / 5) * 100}%`,
+                    }}
+                  />
+                ))
+              : phases.map((phase, index) => {
+                  const Icon = iconMap[phase.icon as keyof typeof iconMap];
+                  return (
+                    <button
+                      key={phase.time}
+                      className={`absolute transform -translate-x-1/2 -translate-y-1/2 rounded-full p-2 ${
+                        phase.color
+                      } ${
+                        selectedPhase === phase
+                          ? "ring-2 ring-offset-2 ring-gray-600"
+                          : ""
+                      }`}
+                      style={{
+                        left: "50%",
+                        top: `${(index / (phases.length - 1)) * 100}%`,
+                      }}
+                      onClick={() => setSelectedPhase(phase)}
+                    >
+                      <Icon className="w-6 h-6 text-white" />
+                    </button>
+                  );
+                })}
           </div>
 
           <div className="w-2/3 relative">
-            {selectedPhase && (
-              <div
-                ref={cardRef}
-                className="absolute transition-all duration-300 ease-in-out"
-                style={{ top: `${cardPosition}px` }}
-              >
-                <Card className={`border-2 ${selectedPhase.borderColor}`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      {React.createElement(
-                        iconMap[selectedPhase.icon as keyof typeof iconMap],
-                        {
-                          className: `w-6 h-6 ${selectedPhase.textColor}`,
-                        }
-                      )}
-                      <h2
-                        className={`text-xl font-semibold ml-2 ${selectedPhase.textColor}`}
-                      >
-                        {selectedPhase.title}
-                      </h2>
-                    </div>
-                    <span className="text-sm text-gray-500 block mb-2">
-                      {selectedPhase.time}
-                    </span>
-                    <p className="text-sm text-gray-600 mb-4">
-                      {selectedPhase.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+            {isLoading ? (
+              <Skeleton className="w-full h-40" />
+            ) : (
+              selectedPhase && (
+                <div
+                  ref={cardRef}
+                  className="absolute transition-all duration-300 ease-in-out"
+                  style={{ top: `${cardPosition}px` }}
+                >
+                  <Card className={`border-2 ${selectedPhase.borderColor}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center mb-2">
+                        {React.createElement(
+                          iconMap[selectedPhase.icon as keyof typeof iconMap],
+                          {
+                            className: `w-6 h-6 ${selectedPhase.textColor}`,
+                          }
+                        )}
+                        <h2
+                          className={`text-xl font-semibold ml-2 ${selectedPhase.textColor}`}
+                        >
+                          {selectedPhase.title}
+                        </h2>
+                      </div>
+                      <span className="text-sm text-gray-500 block mb-2">
+                        {selectedPhase.time}
+                      </span>
+                      <p className="text-sm text-gray-600 mb-4">
+                        {selectedPhase.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              )
             )}
           </div>
         </div>

@@ -1,23 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// Mock data for the example
-const mockData = {
-  averageSteps: 8500,
-  monthData: Array.from({ length: 30 }, (_, i) => ({
-    date: new Date(2024, 9, i + 1),
-    steps: Math.floor(Math.random() * 15000) + 2000,
-  })),
+type DayData = {
+  date: string;
+  steps: number;
+};
+
+type ActivityData = {
+  averageSteps: number;
+  monthData: DayData[];
 };
 
 const Activity = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [currentMonth, setCurrentMonth] = useState(new Date(2024, 9, 1));
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [activityData, setActivityData] = useState<ActivityData | null>(null);
+
+  useEffect(() => {
+    fetchActivityData();
+  }, [currentMonth]);
+
+  const fetchActivityData = async () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth() + 1;
+    const response = await fetch(
+      `/api/activity-data?year=${year}&month=${month}`
+    );
+    const data: ActivityData = await response.json();
+    setActivityData(data);
+  };
 
   const getActivityEmoji = (steps: number) => {
     if (steps >= 10000) return "🏃‍♂️";
@@ -59,6 +75,14 @@ const Activity = () => {
     setSelectedDate(null);
   };
 
+  if (!activityData) {
+    return (
+      <Layout>
+        <div className="flex-1 p-4 pb-24">Loading...</div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="flex-1 p-4 pb-24">
@@ -75,15 +99,21 @@ const Activity = () => {
                     })}
                   </h2>
                   <p className="text-2xl font-bold">
-                    {mockData.monthData[
-                      selectedDate.getDate() - 1
-                    ].steps.toLocaleString()}{" "}
+                    {activityData.monthData
+                      .find(
+                        (day) =>
+                          day.date === selectedDate.toISOString().split("T")[0]
+                      )
+                      ?.steps.toLocaleString()}{" "}
                     steps
                   </p>
                 </div>
                 <div className="text-6xl">
                   {getActivityEmoji(
-                    mockData.monthData[selectedDate.getDate() - 1].steps
+                    activityData.monthData.find(
+                      (day) =>
+                        day.date === selectedDate.toISOString().split("T")[0]
+                    )?.steps || 0
                   )}
                 </div>
               </>
@@ -92,11 +122,11 @@ const Activity = () => {
                 <div>
                   <h2 className="text-xl font-semibold mb-2">Average Steps</h2>
                   <p className="text-2xl font-bold">
-                    {mockData.averageSteps.toLocaleString()}
+                    {activityData.averageSteps.toLocaleString()}
                   </p>
                 </div>
                 <div className="text-6xl">
-                  {getActivityEmoji(mockData.averageSteps)}
+                  {getActivityEmoji(activityData.averageSteps)}
                 </div>
               </>
             )}
@@ -132,17 +162,17 @@ const Activity = () => {
           {Array.from({ length: firstDayOfMonth }).map((_, index) => (
             <div key={`empty-${index}`} className="h-10" />
           ))}
-          {mockData.monthData.map((day, index) => (
+          {activityData.monthData.map((day, index) => (
             <Button
               key={index}
               className={`h-10 w-full ${getActivityColor(day.steps)} ${
-                selectedDate?.getDate() === day.date.getDate()
+                selectedDate?.toISOString().split("T")[0] === day.date
                   ? "ring-2 ring-white"
                   : ""
               }`}
-              onClick={() => setSelectedDate(day.date)}
+              onClick={() => setSelectedDate(new Date(day.date))}
             >
-              <span className="sr-only">{day.date.getDate()}</span>
+              <span className="sr-only">{new Date(day.date).getDate()}</span>
             </Button>
           ))}
         </div>

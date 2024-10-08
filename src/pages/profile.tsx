@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CheckCircle, RefreshCw } from "lucide-react";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -19,6 +20,15 @@ const Profile = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [tempProfile, setTempProfile] = useState(profile);
+  const [syncStatus, setSyncStatus] = useState<"syncing" | "synced">("syncing");
+
+  useEffect(() => {
+    const syncTimer = setTimeout(() => {
+      setSyncStatus("synced");
+    }, 3000); // Change to "synced" after 3 seconds
+
+    return () => clearTimeout(syncTimer);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,8 +67,22 @@ const Profile = () => {
               <h3 className="text-lg font-semibold text-[#7B2CBF]">
                 Cudis 001 Ring
               </h3>
-              <p className="text-sm text-gray-600">
-                Connected and syncing data
+              <p className="text-sm text-gray-600 flex items-center">
+                Connected{" "}
+                <CheckCircle className="w-4 h-4 ml-1 text-green-500" />
+              </p>
+              <p className="text-sm text-gray-600 flex items-center">
+                {syncStatus === "syncing" ? (
+                  <>
+                    Syncing data{" "}
+                    <RefreshCw className="w-4 h-4 ml-1 text-blue-500 animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    Synced{" "}
+                    <CheckCircle className="w-4 h-4 ml-1 text-green-500" />
+                  </>
+                )}
               </p>
             </div>
           </CardContent>

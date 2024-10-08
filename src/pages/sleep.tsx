@@ -1,33 +1,56 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
+interface SleepData {
+  sleepDebt: number;
+  sleepDebtDelta: number;
+  deepSleep: number;
+  lightSleep: number;
+  awake: number;
+  sumDuration: number;
+}
+
+interface WeeklyData {
+  day: string;
+  sleep: number;
+  deep: number;
+  light: number;
+  awake: number;
+}
+
 const Sleep = () => {
-  const sleepData = {
-    sleepDebt: 2.5,
-    sleepDebtDelta: 0.5,
-    deepSleep: 10,
-    lightSleep: 86,
-    awake: 4,
-    sumDuration: 431,
-  };
-
-  const weeklyData = [
-    { day: "M", sleep: 7.2, deep: 0.7, light: 5.8, awake: 0.7 },
-    { day: "T", sleep: 6.8, deep: 0.5, light: 5.6, awake: 0.7 },
-    { day: "W", sleep: 7.5, deep: 0.8, light: 6.0, awake: 0.7 },
-    { day: "T", sleep: 6.5, deep: 0.6, light: 5.3, awake: 0.6 },
-    { day: "F", sleep: 7.0, deep: 0.7, light: 5.7, awake: 0.6 },
-    { day: "S", sleep: 8.2, deep: 1.0, light: 6.5, awake: 0.7 },
-    { day: "S", sleep: 7.8, deep: 0.9, light: 6.2, awake: 0.7 },
-  ];
-
+  const [sleepData, setSleepData] = useState<SleepData | null>(null);
+  const [weeklyData, setWeeklyData] = useState<WeeklyData[]>([]);
   const [selectedSleepStage, setSelectedSleepStage] = useState<string | null>(
     null
   );
+
+  useEffect(() => {
+    const fetchSleepData = async () => {
+      try {
+        const response = await fetch("/api/sleep-data");
+        const data = await response.json();
+        setSleepData(data.sleepData);
+        setWeeklyData(data.weeklyData);
+      } catch (error) {
+        console.error("Error fetching sleep data:", error);
+      }
+    };
+
+    fetchSleepData();
+  }, []);
+
+  if (!sleepData) {
+    return (
+      <Layout>
+        <div>Loading...</div>
+      </Layout>
+    );
+  }
 
   const getSleepDebtEmoji = (debt: number) => {
     if (debt <= 0) return "😊";

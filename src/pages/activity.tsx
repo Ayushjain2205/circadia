@@ -21,6 +21,11 @@ const Activity = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [activityData, setActivityData] = useState<ActivityData | null>(null);
 
+  const today = new Date();
+  const isCurrentMonthLatest =
+    currentMonth.getFullYear() === today.getFullYear() &&
+    currentMonth.getMonth() === today.getMonth();
+
   useEffect(() => {
     fetchActivityData();
   }, [currentMonth]);
@@ -69,10 +74,12 @@ const Activity = () => {
   };
 
   const nextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
-    );
-    setSelectedDate(null);
+    if (!isCurrentMonthLatest) {
+      setCurrentMonth(
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+      );
+      setSelectedDate(null);
+    }
   };
 
   if (!activityData) {
@@ -144,7 +151,12 @@ const Activity = () => {
               year: "numeric",
             })}
           </h3>
-          <Button onClick={nextMonth} variant="outline" size="icon">
+          <Button
+            onClick={nextMonth}
+            variant="outline"
+            size="icon"
+            disabled={isCurrentMonthLatest}
+          >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -162,19 +174,26 @@ const Activity = () => {
           {Array.from({ length: firstDayOfMonth }).map((_, index) => (
             <div key={`empty-${index}`} className="h-10" />
           ))}
-          {activityData.monthData.map((day, index) => (
-            <Button
-              key={index}
-              className={`h-10 w-full ${getActivityColor(day.steps)} ${
-                selectedDate?.toISOString().split("T")[0] === day.date
-                  ? "ring-2 ring-white"
-                  : ""
-              }`}
-              onClick={() => setSelectedDate(new Date(day.date))}
-            >
-              <span className="sr-only">{new Date(day.date).getDate()}</span>
-            </Button>
-          ))}
+          {activityData.monthData.map((day, index) => {
+            const dayDate = new Date(day.date);
+            const isInFuture = dayDate > today;
+            return (
+              <Button
+                key={index}
+                className={`h-10 w-full ${
+                  isInFuture ? "bg-gray-200" : getActivityColor(day.steps)
+                } ${
+                  selectedDate?.toISOString().split("T")[0] === day.date
+                    ? "ring-2 ring-white"
+                    : ""
+                }`}
+                onClick={() => !isInFuture && setSelectedDate(dayDate)}
+                disabled={isInFuture}
+              >
+                <span className="sr-only">{dayDate.getDate()}</span>
+              </Button>
+            );
+          })}
         </div>
 
         {/* Legend */}

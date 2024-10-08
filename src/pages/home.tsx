@@ -1,15 +1,20 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { User, ArrowUp, ArrowDown, Flower } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  User,
-  ArrowUp,
-  ArrowDown,
-  BadgeDollarSign,
-  Flower,
-} from "lucide-react";
-import Image from "next/image";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import confetti from "canvas-confetti";
 
 type ScoreType = "sleep" | "activity" | "health";
 type Metric = {
@@ -90,6 +95,17 @@ export default function HomePage() {
   });
 
   const [selectedScore, setSelectedScore] = useState<ScoreType | null>(null);
+  const [isGlowing, setIsGlowing] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
+  const [isClaimed, setIsClaimed] = useState(false);
+
+  useEffect(() => {
+    const glowInterval = setInterval(() => {
+      setIsGlowing((prev) => !prev);
+    }, 1500);
+
+    return () => clearInterval(glowInterval);
+  }, []);
 
   const getScoreEmoji = (score: number) => {
     if (score >= 90) return "🌟";
@@ -105,18 +121,41 @@ export default function HomePage() {
     return null;
   };
 
+  const handleCoinClick = () => {
+    if (!isClaimed) {
+      setShowPopup(true);
+    }
+  };
+
+  const handleClaim = () => {
+    setCoinCount((prev) => prev + 10);
+    setIsClaimed(true);
+    setShowPopup(false);
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+    });
+  };
+
   return (
     <Layout>
       <div className="flex-1 p-4 pb-24">
         {/* Coin Count */}
         <div className="flex justify-between mb-4">
-          {/* Onclick go to /profile */}
           <Link href="/profile">
             <div className="inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full p-2">
               <User className="w-6 h-6" />
             </div>
           </Link>
-          <div className="inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full py-1 px-3">
+          <div
+            className={`inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full py-1 px-3 cursor-pointer transition-all duration-300 ${
+              isGlowing && !isClaimed
+                ? "shadow-[0_0_15px_5px_rgba(123,44,191,0.5)]"
+                : ""
+            }`}
+            onClick={handleCoinClick}
+          >
             <Flower className="w-6 h-6" />
             <span className="ml-1 text-sm font-semibold">{coinCount}</span>
           </div>
@@ -197,6 +236,21 @@ export default function HomePage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Popup for winning coins */}
+        <Dialog open={showPopup} onOpenChange={setShowPopup}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Congratulations! 🎉</DialogTitle>
+              <DialogDescription>
+                You've won 10 wellness coins for your great progress!
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button onClick={handleClaim}>Claim Coins</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );

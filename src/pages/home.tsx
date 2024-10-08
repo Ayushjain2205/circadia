@@ -102,7 +102,7 @@ export default function HomePage() {
   useEffect(() => {
     const glowInterval = setInterval(() => {
       setIsGlowing((prev) => !prev);
-    }, 1500);
+    }, 1000);
 
     return () => clearInterval(glowInterval);
   }, []);
@@ -239,16 +239,33 @@ export default function HomePage() {
 
         {/* Popup for winning coins */}
         <Dialog open={showPopup} onOpenChange={setShowPopup}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Congratulations! 🎉</DialogTitle>
-              <DialogDescription>
-                You've won 10 wellness coins for your great progress!
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button onClick={handleClaim}>Claim Coins</Button>
-            </DialogFooter>
+          <DialogContent className="bg-[#F3E8FF] border-2 border-[#7B2CBF] rounded-3xl max-w-[300px] p-0 [&>button]:hidden">
+            <div className="bg-[#7B2CBF] p-4 rounded-t-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-white text-center text-2xl font-bold">
+                  Congratulations! 🎉
+                </DialogTitle>
+              </DialogHeader>
+            </div>
+            <div className="p-6">
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="bg-[#E2CFEA] rounded-full p-6">
+                  <Flower className="w-16 h-16 text-[#7B2CBF]" />
+                </div>
+                <DialogDescription className="text-center text-[#7B2CBF] text-lg font-semibold">
+                  You've won wellness coins!
+                </DialogDescription>
+              </div>
+              <DialogFooter className="mt-6">
+                <Button
+                  onClick={handleClaim}
+                  className="w-full bg-[#7B2CBF] hover:bg-[#9D4EDD] outline-none text-white font-bold py-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <Flower className="w-5 h-5 mr-2" />
+                  Claim 10 Coins
+                </Button>
+              </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

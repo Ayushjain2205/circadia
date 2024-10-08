@@ -15,10 +15,19 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-const phases = [
+type PhaseData = {
+  time: string;
+  icon: string;
+  title: string;
+  description: string;
+  color: string;
+  borderColor: string;
+  textColor: string;
+};
+
+const phaseConfigs = [
   {
-    time: "2 AM",
-    icon: <Moon className="w-6 h-6" />,
+    icon: "Moon",
     title: "Deep Sleep",
     description: "Restorative sleep phase",
     color: "bg-blue-400",
@@ -26,8 +35,7 @@ const phases = [
     textColor: "text-blue-400",
   },
   {
-    time: "6 AM",
-    icon: <Sun className="w-6 h-6" />,
+    icon: "Sun",
     title: "Wake Up",
     description: "Natural wake-up time",
     color: "bg-yellow-400",
@@ -35,8 +43,7 @@ const phases = [
     textColor: "text-yellow-400",
   },
   {
-    time: "10 AM",
-    icon: <Coffee className="w-6 h-6" />,
+    icon: "Coffee",
     title: "Peak Alertness",
     description: "High cortisol, good for focused work",
     color: "bg-green-400",
@@ -44,8 +51,7 @@ const phases = [
     textColor: "text-green-400",
   },
   {
-    time: "2 PM",
-    icon: <Brain className="w-6 h-6" />,
+    icon: "Brain",
     title: "Peak Cognition",
     description: "Best time for critical thinking",
     color: "bg-purple-400",
@@ -53,8 +59,7 @@ const phases = [
     textColor: "text-purple-400",
   },
   {
-    time: "6 PM",
-    icon: <Zap className="w-6 h-6" />,
+    icon: "Zap",
     title: "Fastest Reactions",
     description: "Highest physical performance",
     color: "bg-red-400",
@@ -62,8 +67,7 @@ const phases = [
     textColor: "text-red-400",
   },
   {
-    time: "10 PM",
-    icon: <BedDouble className="w-6 h-6" />,
+    icon: "BedDouble",
     title: "Melatonin Release",
     description: "Body prepares for sleep",
     color: "bg-indigo-400",
@@ -72,14 +76,39 @@ const phases = [
   },
 ];
 
+const iconMap = {
+  Moon,
+  Sun,
+  Coffee,
+  Zap,
+  Brain,
+  BedDouble,
+};
+
 const Rhythm = () => {
-  const [selectedPhase, setSelectedPhase] = useState(phases[0]);
+  const [phases, setPhases] = useState<PhaseData[]>([]);
+  const [selectedPhase, setSelectedPhase] = useState<PhaseData | null>(null);
   const [cardPosition, setCardPosition] = useState(0);
   const curveRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (curveRef.current && cardRef.current) {
+    const fetchRhythmData = async () => {
+      const response = await fetch("/api/rhythm-data");
+      const data: { time: string }[] = await response.json();
+      const combinedData = data.map((item, index) => ({
+        ...item,
+        ...phaseConfigs[index],
+      }));
+      setPhases(combinedData);
+      setSelectedPhase(combinedData[0]);
+    };
+
+    fetchRhythmData();
+  }, []);
+
+  useEffect(() => {
+    if (curveRef.current && cardRef.current && selectedPhase) {
       const index = phases.findIndex((phase) => phase === selectedPhase);
       const totalHeight = curveRef.current.clientHeight;
       const cardHeight = cardRef.current.clientHeight;
@@ -93,7 +122,11 @@ const Rhythm = () => {
       );
       setCardPosition(newPosition);
     }
-  }, [selectedPhase]);
+  }, [selectedPhase, phases]);
+
+  if (phases.length === 0) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Layout>
@@ -122,56 +155,62 @@ const Rhythm = () => {
               </defs>
             </svg>
 
-            {phases.map((phase, index) => (
-              <button
-                key={phase.time}
-                className={`absolute transform -translate-x-1/2 -translate-y-1/2 rounded-full p-2 ${
-                  phase.color
-                } ${
-                  selectedPhase === phase
-                    ? "ring-2 ring-offset-2 ring-gray-600"
-                    : ""
-                }`}
-                style={{
-                  left: "50%",
-                  top: `${(index / (phases.length - 1)) * 100}%`,
-                }}
-                onClick={() => setSelectedPhase(phase)}
-              >
-                {React.cloneElement(phase.icon, {
-                  className: "w-6 h-6 text-white",
-                })}
-              </button>
-            ))}
+            {phases.map((phase, index) => {
+              const Icon = iconMap[phase.icon as keyof typeof iconMap];
+              return (
+                <button
+                  key={phase.time}
+                  className={`absolute transform -translate-x-1/2 -translate-y-1/2 rounded-full p-2 ${
+                    phase.color
+                  } ${
+                    selectedPhase === phase
+                      ? "ring-2 ring-offset-2 ring-gray-600"
+                      : ""
+                  }`}
+                  style={{
+                    left: "50%",
+                    top: `${(index / (phases.length - 1)) * 100}%`,
+                  }}
+                  onClick={() => setSelectedPhase(phase)}
+                >
+                  <Icon className="w-6 h-6 text-white" />
+                </button>
+              );
+            })}
           </div>
 
           <div className="w-2/3 relative">
-            <div
-              ref={cardRef}
-              className="absolute transition-all duration-300 ease-in-out"
-              style={{ top: `${cardPosition}px` }}
-            >
-              <Card className={`border-2 ${selectedPhase.borderColor}`}>
-                <CardContent className="p-4">
-                  <div className="flex items-center mb-2">
-                    {React.cloneElement(selectedPhase.icon, {
-                      className: `w-6 h-6 ${selectedPhase.textColor}`,
-                    })}
-                    <h2
-                      className={`text-xl font-semibold ml-2 ${selectedPhase.textColor}`}
-                    >
-                      {selectedPhase.title}
-                    </h2>
-                  </div>
-                  <span className="text-sm text-gray-500 block mb-2">
-                    {selectedPhase.time}
-                  </span>
-                  <p className="text-sm text-gray-600 mb-4">
-                    {selectedPhase.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            {selectedPhase && (
+              <div
+                ref={cardRef}
+                className="absolute transition-all duration-300 ease-in-out"
+                style={{ top: `${cardPosition}px` }}
+              >
+                <Card className={`border-2 ${selectedPhase.borderColor}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center mb-2">
+                      {React.createElement(
+                        iconMap[selectedPhase.icon as keyof typeof iconMap],
+                        {
+                          className: `w-6 h-6 ${selectedPhase.textColor}`,
+                        }
+                      )}
+                      <h2
+                        className={`text-xl font-semibold ml-2 ${selectedPhase.textColor}`}
+                      >
+                        {selectedPhase.title}
+                      </h2>
+                    </div>
+                    <span className="text-sm text-gray-500 block mb-2">
+                      {selectedPhase.time}
+                    </span>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {selectedPhase.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
 

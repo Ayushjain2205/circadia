@@ -30,8 +30,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             label="Sleep"
             isActive={isActive("/sleep")}
           />
-          <Link href="/askAi" className="relative ">
-            <Button className="rounded-full bg-[#7B2CBF] text-white hover:bg-[#E2CFEA] hover:text-[#7B2CBF] w-16 h-16 flex flex-col items-center justify-center ">
+          <Link href="/askAi" className="relative">
+            <Button
+              className={`rounded-full w-16 h-16 flex flex-col items-center justify-center transition-colors ${
+                isActive("/askAi")
+                  ? "bg-[#E2CFEA] text-[#7B2CBF]"
+                  : "bg-[#7B2CBF] text-white hover:bg-[#E2CFEA] hover:text-[#7B2CBF]"
+              }`}
+            >
               <Brain className="w-8 h-8" />
             </Button>
           </Link>

@@ -151,7 +151,7 @@ const AskAI = () => {
               className="bg-[#7B2CBF] hover:bg-[#9D4EDD] rounded-full w-12 h-12 flex items-center justify-center"
               disabled={isLoading}
             >
-              <Send className="w-6 h-6 text-white" />
+              <Send className="w-8 h-8 text-white" />
               <span className="sr-only">Send</span>
             </Button>
           </form>

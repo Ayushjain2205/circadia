@@ -5,6 +5,7 @@ import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type DayData = {
   date: string;
@@ -16,10 +17,11 @@ type ActivityData = {
   monthData: DayData[];
 };
 
-const Activity = () => {
+export default function Component() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [activityData, setActivityData] = useState<ActivityData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const today = new Date();
   const isCurrentMonthLatest =
@@ -31,13 +33,20 @@ const Activity = () => {
   }, [currentMonth]);
 
   const fetchActivityData = async () => {
+    setIsLoading(true);
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth() + 1;
-    const response = await fetch(
-      `/api/activity-data?year=${year}&month=${month}`
-    );
-    const data: ActivityData = await response.json();
-    setActivityData(data);
+    try {
+      const response = await fetch(
+        `/api/activity-data?year=${year}&month=${month}`
+      );
+      const data: ActivityData = await response.json();
+      setActivityData(data);
+    } catch (error) {
+      console.error("Failed to fetch activity data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getActivityEmoji = (steps: number) => {
@@ -48,11 +57,11 @@ const Activity = () => {
   };
 
   const getActivityColor = (steps: number) => {
-    if (steps >= 10000) return "bg-[#7B2CBF]"; // Dark purple
-    if (steps >= 7500) return "bg-[#9D4EDD]"; // Medium purple
-    if (steps >= 5000) return "bg-[#C77DFF]"; // Light purple
-    if (steps > 0) return "bg-[#E0AAFF]"; // Very light purple
-    return "bg-gray-200"; // No activity
+    if (steps >= 10000) return "bg-[#7B2CBF]";
+    if (steps >= 7500) return "bg-[#9D4EDD]";
+    if (steps >= 5000) return "bg-[#C77DFF]";
+    if (steps > 0) return "bg-[#E0AAFF]";
+    return "bg-gray-200";
   };
 
   const daysInMonth = new Date(
@@ -82,21 +91,21 @@ const Activity = () => {
     }
   };
 
-  if (!activityData) {
-    return (
-      <Layout>
-        <div className="flex-1 p-4 pb-24">Loading...</div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <div className="flex-1 p-4 pb-24">
         {/* Average Steps or Selected Date Card */}
         <Card className="mb-6 bg-[#7B2CBF] text-white">
           <CardContent className="flex items-center justify-between p-6">
-            {selectedDate ? (
+            {isLoading ? (
+              <>
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-32 bg-white/20" />
+                  <Skeleton className="h-8 w-24 bg-white/20" />
+                </div>
+                <Skeleton className="h-16 w-16 rounded-full bg-white/20" />
+              </>
+            ) : selectedDate ? (
               <>
                 <div>
                   <h2 className="text-xl font-semibold mb-2">
@@ -106,7 +115,7 @@ const Activity = () => {
                     })}
                   </h2>
                   <p className="text-2xl font-bold">
-                    {activityData.monthData
+                    {activityData?.monthData
                       .find(
                         (day) =>
                           day.date === selectedDate.toISOString().split("T")[0]
@@ -117,7 +126,7 @@ const Activity = () => {
                 </div>
                 <div className="text-6xl">
                   {getActivityEmoji(
-                    activityData.monthData.find(
+                    activityData?.monthData.find(
                       (day) =>
                         day.date === selectedDate.toISOString().split("T")[0]
                     )?.steps || 0
@@ -129,11 +138,11 @@ const Activity = () => {
                 <div>
                   <h2 className="text-xl font-semibold mb-2">Average Steps</h2>
                   <p className="text-2xl font-bold">
-                    {activityData.averageSteps.toLocaleString()}
+                    {activityData?.averageSteps.toLocaleString()}
                   </p>
                 </div>
                 <div className="text-6xl">
-                  {getActivityEmoji(activityData.averageSteps)}
+                  {getActivityEmoji(activityData?.averageSteps || 0)}
                 </div>
               </>
             )}
@@ -174,31 +183,35 @@ const Activity = () => {
           {Array.from({ length: firstDayOfMonth }).map((_, index) => (
             <div key={`empty-${index}`} className="h-10" />
           ))}
-          {activityData.monthData.map((day, index) => {
-            const dayDate = new Date(day.date);
-            const isInFuture = dayDate > today;
-            const isCurrentMonth =
-              dayDate.getMonth() === currentMonth.getMonth();
+          {isLoading
+            ? Array.from({ length: daysInMonth }).map((_, index) => (
+                <Skeleton key={`skeleton-${index}`} className="h-10 w-full" />
+              ))
+            : activityData?.monthData.map((day, index) => {
+                const dayDate = new Date(day.date);
+                const isInFuture = dayDate > today;
+                const isCurrentMonth =
+                  dayDate.getMonth() === currentMonth.getMonth();
 
-            if (!isCurrentMonth) return null; // Skip days not in the current month
+                if (!isCurrentMonth) return null;
 
-            return (
-              <Button
-                key={index}
-                className={`h-10 w-full ${
-                  isInFuture ? "bg-gray-200" : getActivityColor(day.steps)
-                } ${
-                  selectedDate?.toISOString().split("T")[0] === day.date
-                    ? "ring-2 ring-white"
-                    : ""
-                }`}
-                onClick={() => !isInFuture && setSelectedDate(dayDate)}
-                disabled={isInFuture}
-              >
-                <span className="sr-only">{dayDate.getDate()}</span>
-              </Button>
-            );
-          })}
+                return (
+                  <Button
+                    key={index}
+                    className={`h-10 w-full ${
+                      isInFuture ? "bg-gray-200" : getActivityColor(day.steps)
+                    } ${
+                      selectedDate?.toISOString().split("T")[0] === day.date
+                        ? "ring-2 ring-white"
+                        : ""
+                    }`}
+                    onClick={() => !isInFuture && setSelectedDate(dayDate)}
+                    disabled={isInFuture}
+                  >
+                    <span className="sr-only">{dayDate.getDate()}</span>
+                  </Button>
+                );
+              })}
         </div>
 
         {/* Legend */}
@@ -217,6 +230,4 @@ const Activity = () => {
       </div>
     </Layout>
   );
-};
-
-export default Activity;
+}

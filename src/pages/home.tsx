@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import confetti from "canvas-confetti";
 
 type ScoreType = "sleep" | "activity" | "health";
@@ -108,16 +109,6 @@ export default function HomePage() {
     });
   };
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex-1 p-4 flex items-center justify-center">
-          <p>Loading...</p>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <div className="flex-1 p-4 pb-24">
@@ -128,28 +119,36 @@ export default function HomePage() {
               <User className="w-6 h-6" />
             </div>
           </Link>
-          <div
-            className={`inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full py-1 px-3 cursor-pointer transition-all duration-300 ${
-              isGlowing && !isClaimed
-                ? "shadow-[0_0_15px_5px_rgba(123,44,191,0.5)]"
-                : ""
-            }`}
-            onClick={handleCoinClick}
-          >
-            <Flower className="w-6 h-6" />
-            <span className="ml-1 text-sm font-semibold">{coinCount}</span>
-          </div>
+          {isLoading ? (
+            <Skeleton className="w-20 h-10 rounded-full" />
+          ) : (
+            <div
+              className={`inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full py-1 px-3 cursor-pointer transition-all duration-300 ${
+                isGlowing && !isClaimed
+                  ? "shadow-[0_0_15px_5px_rgba(123,44,191,0.5)]"
+                  : ""
+              }`}
+              onClick={handleCoinClick}
+            >
+              <Flower className="w-6 h-6" />
+              <span className="ml-1 text-sm font-semibold">{coinCount}</span>
+            </div>
+          )}
         </div>
 
         {/* Overall Wellness Score */}
-        <Card className="mb-6 border-none shadow-lg bg-[#7B2CBF] ">
+        <Card className="mb-6 border-none shadow-lg bg-[#7B2CBF]">
           <CardContent className="flex flex-col items-center justify-center p-6">
             <h2 className="text-2xl font-semibold mb-2 text-white">
               Circadian Score
             </h2>
-            <div className="text-7xl font-bold text-white flex items-center">
-              {overallScore} {getScoreEmoji(overallScore)}
-            </div>
+            {isLoading ? (
+              <Skeleton className="w-32 h-32 rounded-full bg-white/20" />
+            ) : (
+              <div className="text-7xl font-bold text-white flex items-center">
+                {overallScore} {getScoreEmoji(overallScore)}
+              </div>
+            )}
             <div className="text-sm mt-2 text-white">
               Powered by Circadia AI
             </div>
@@ -179,9 +178,13 @@ export default function HomePage() {
                 <h3 className="text-lg font-semibold capitalize mb-1">
                   {type}
                 </h3>
-                <div className="text-2xl font-bold text-[#7B2CBF]">
-                  {scores[type].score}
-                </div>
+                {isLoading ? (
+                  <Skeleton className="w-12 h-8" />
+                ) : (
+                  <div className="text-2xl font-bold text-[#7B2CBF]">
+                    {scores[type].score}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -195,23 +198,33 @@ export default function HomePage() {
                 {selectedScore} Metrics
               </h3>
               <ul className="space-y-3">
-                {scores[selectedScore].metrics.map((metric, index) => (
-                  <li
-                    key={index}
-                    className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
-                  >
-                    <span className="flex items-center">
-                      <span className="mr-2">{metric.emoji}</span>
-                      {metric.name}
-                    </span>
-                    <span className="font-semibold text-[#7B2CBF] flex items-center">
-                      {metric.value} {metric.unit}
-                      <span className="ml-2">
-                        {getTrendArrow(metric.trend)}
-                      </span>
-                    </span>
-                  </li>
-                ))}
+                {isLoading
+                  ? Array.from({ length: 3 }).map((_, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
+                      >
+                        <Skeleton className="w-24 h-6" />
+                        <Skeleton className="w-16 h-6" />
+                      </li>
+                    ))
+                  : scores[selectedScore].metrics.map((metric, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
+                      >
+                        <span className="flex items-center">
+                          <span className="mr-2">{metric.emoji}</span>
+                          {metric.name}
+                        </span>
+                        <span className="font-semibold text-[#7B2CBF] flex items-center">
+                          {metric.value} {metric.unit}
+                          <span className="ml-2">
+                            {getTrendArrow(metric.trend)}
+                          </span>
+                        </span>
+                      </li>
+                    ))}
               </ul>
             </CardContent>
           </Card>

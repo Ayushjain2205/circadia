@@ -2,7 +2,13 @@ import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { User, ArrowUp, ArrowDown, BadgeDollarSign } from "lucide-react";
+import {
+  User,
+  ArrowUp,
+  ArrowDown,
+  BadgeDollarSign,
+  Flower,
+} from "lucide-react";
 import Image from "next/image";
 
 type ScoreType = "sleep" | "activity" | "health";
@@ -111,7 +117,7 @@ export default function HomePage() {
             </div>
           </Link>
           <div className="inline-flex items-center bg-[#E2CFEA] text-[#7B2CBF] rounded-full py-1 px-3">
-            <BadgeDollarSign className="w-6 h-6" />
+            <Flower className="w-6 h-6" />
             <span className="ml-1 text-sm font-semibold">{coinCount}</span>
           </div>
         </div>

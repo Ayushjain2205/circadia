@@ -10,7 +10,7 @@ function roundToOneDecimal(num: number): number {
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const sleepData = {
-    sleepDebt: roundToOneDecimal(randomInRange(0, 5)),
+    sleepDebt: roundToOneDecimal(randomInRange(1, 5)),
     sleepDebtDelta: roundToOneDecimal(randomInRange(-1, 1)),
     deepSleep: Math.round(randomInRange(5, 20)),
     lightSleep: Math.round(randomInRange(70, 90)),

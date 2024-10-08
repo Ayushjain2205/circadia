@@ -177,6 +177,11 @@ const Activity = () => {
           {activityData.monthData.map((day, index) => {
             const dayDate = new Date(day.date);
             const isInFuture = dayDate > today;
+            const isCurrentMonth =
+              dayDate.getMonth() === currentMonth.getMonth();
+
+            if (!isCurrentMonth) return null; // Skip days not in the current month
+
             return (
               <Button
                 key={index}

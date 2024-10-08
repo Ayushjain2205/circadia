@@ -217,8 +217,8 @@ const Sleep = () => {
               {weeklyData.map((day, index) => (
                 <div key={index} className="flex flex-col items-center">
                   <div
-                    className="relative w-6 bg-gray-100 rounded-lg overflow-hidden"
-                    style={{ height: "160px" }}
+                    className="relative w-6  rounded-lg overflow-hidden"
+                    style={{ height: "160px", borderRadius: "1rem" }}
                   >
                     <div
                       className="absolute bottom-0 left-0 right-0 bg-[#7B2CBF]  "

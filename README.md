@@ -25,7 +25,7 @@ And the cherry on top? Earn $WELL tokens for leveling up your wellness game! ðŸ’
 
 Dive into the Circadia experience with our demo:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/vukAsN6j_Lw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[Watch Circadia Demo on YouTube](https://youtu.be/vukAsN6j_Lw)
 
 ## ðŸš€ Features
 

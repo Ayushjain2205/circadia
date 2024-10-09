@@ -1,8 +1,9 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Home, Moon, Activity, Footprints, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,8 +11,42 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 640);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
 
   const isActive = (path: string) => router.pathname === path;
+
+  if (!isMobile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#F3E8FF] to-white font-poppins text-gray-800 p-4">
+        <div className="flex flex-col items-center justify-center max-w-md text-center">
+          <h1 className="text-3xl font-bold text-[#7B2CBF] mb-4">Circadia</h1>
+          <p className="text-lg mb-8">
+            Kindly open this app on a mobile device for the best experience.
+          </p>
+          <Image
+            src="/logo.svg"
+            alt="Circadia Logo"
+            width={100}
+            height={100}
+            className="mx-auto"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white font-poppins text-gray-800">

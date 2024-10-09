@@ -11,11 +11,11 @@ import { CheckCircle, RefreshCw } from "lucide-react";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
-    name: "John Doe",
+    name: "Ayush Jain",
     gender: "Male",
-    age: "30",
+    age: "23",
     height: "175",
-    weight: "70",
+    weight: "68",
   });
 
   const [isEditing, setIsEditing] = useState(false);

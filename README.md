@@ -1,40 +1,37 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Circadia 🌙✨
 
-## Getting Started
+Revolutionizing wellness through AI and circadian rhythm optimization! 🚀
 
-First, run the development server:
+## 🌟 About
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Circadia is your AI-powered wellness companion, syncing your life with your body's natural rhythm. 🧠🔄
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+We tap into your wellness ring data to unlock the secrets of your health:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- 💓 Heart rate
+- 😴 Sleep patterns
+- 🫁 Blood oxygen levels
+- 🏃‍♀️ Physical activity
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Our AI magic ✨ then:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- 📊 Calculates your health scores
+- 🗺️ Maps your unique Circadian Rhythm journey
+- 🧘‍♂️ Delivers personalized wellness coaching
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+And the cherry on top? Earn $WELL tokens for leveling up your wellness game! 💰
 
-## Learn More
+## 🎥 See Circadia in Action
 
-To learn more about Next.js, take a look at the following resources:
+Dive into the Circadia experience with our demo:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<iframe width="560" height="315" src="https://www.youtube.com/embed/vukAsN6j_Lw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## 🚀 Features
 
-## Deploy on Vercel
+- 💍 Smart ring integration for 24/7 health tracking
+- 🤖 AI-powered health analysis that actually makes sense
+- 👩‍🏫 Your personal wellness coach in your pocket
+- 🏆 $WELL token rewards - because who doesn't love prizes?
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Join us in the wellness revolution! Let's make every tick of the clock count towards a healthier you. 🌈🎉

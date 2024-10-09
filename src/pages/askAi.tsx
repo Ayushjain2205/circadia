@@ -18,7 +18,7 @@ interface Message {
 const AskAI = () => {
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
-      api: "/api/ask-ai", // Specify the correct API route
+      api: "/api/ask-ai",
     });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

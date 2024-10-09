@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useChat } from "ai/react";
 
 interface Message {
   id: number;
@@ -15,9 +16,10 @@ interface Message {
 }
 
 const AskAI = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat({
+      api: "/api/ask-ai", // Specify the correct API route
+    });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -28,51 +30,11 @@ const AskAI = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (input.trim() === "") return;
-
-    const newMessage: Message = {
-      id: Date.now(),
-      text: input,
-      sender: "user",
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/ask-ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: input }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch");
-      }
-
-      const data = await response.json();
-      const aiResponse: Message = {
-        id: Date.now(),
-        text: data.message,
-        sender: "ai",
-      };
-      setMessages((prev) => [...prev, aiResponse]);
-    } catch (error) {
-      console.error("Error fetching AI response:", error);
-      const errorMessage: Message = {
-        id: Date.now(),
-        text: "I'm sorry, I couldn't process your request at the moment. Please try again later.",
-        sender: "ai",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Check if the last message is from the assistant and incomplete
+  const isStreaming =
+    messages.length > 0 &&
+    messages[messages.length - 1].role === "assistant" &&
+    !messages[messages.length - 1].content.trim().endsWith(".");
 
   return (
     <Layout>
@@ -85,17 +47,17 @@ const AskAI = () => {
             <div
               key={message.id}
               className={`mb-4 ${
-                message.sender === "user" ? "text-right" : "text-left"
+                message.role === "user" ? "text-right" : "text-left"
               }`}
             >
               <div
                 className={`inline-block max-w-[80%] p-3 rounded-2xl ${
-                  message.sender === "user"
+                  message.role === "user"
                     ? "bg-[#7B2CBF] text-white"
                     : "bg-white text-[#7B2CBF] shadow-md"
                 }`}
               >
-                {message.sender === "ai" && (
+                {message.role === "assistant" && (
                   <div className="flex items-center mb-2">
                     <img
                       src="/logo.svg"
@@ -109,12 +71,12 @@ const AskAI = () => {
                   remarkPlugins={[remarkGfm]}
                   className="markdown-content"
                 >
-                  {message.text}
+                  {message.content}
                 </ReactMarkdown>
               </div>
             </div>
           ))}
-          {isLoading && (
+          {isLoading && !isStreaming && (
             <div className="text-left mb-4">
               <div className="inline-block max-w-[80%] p-3 rounded-2xl bg-white text-[#7B2CBF] shadow-md">
                 <div className="flex items-center">
@@ -133,16 +95,10 @@ const AskAI = () => {
           <div ref={messagesEndRef} />
         </div>
         <div className="fixed bottom-20 left-0 right-0 p-4 bg-transparent">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}
-            className="flex items-center space-x-2"
-          >
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2">
             <Input
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               placeholder="Ask me anything..."
               className="flex-1 h-12 rounded-full border-2 border-[#7B2CBF] bg-white text-[#7B2CBF] placeholder-[#7B2CBF] focus:ring-2 focus:ring-[#9D4EDD]"
             />

@@ -1,22 +1,23 @@
+import { OpenAIStream, StreamingTextResponse } from "ai";
 import OpenAI from "openai";
-import type { NextApiRequest, NextApiResponse } from "next";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export const config = {
+  runtime: "edge",
+};
+
+export default async function handler(req: Request) {
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return new Response("Method not allowed", { status: 405 });
   }
 
-  const { message } = req.body;
+  const { messages } = await req.json();
 
-  if (!message) {
-    return res.status(400).json({ message: "Message is required" });
+  if (!messages) {
+    return new Response("Messages are required", { status: 400 });
   }
 
   try {
@@ -28,16 +29,17 @@ export default async function handler(
           content:
             "You are Circadia AI, a wellness assistant specializing in health, sleep, mental well-being, and nutrition. Provide helpful and accurate information to users' questions in these areas. Try keeping your responses concise and to the point.",
         },
-        { role: "user", content: message },
+        ...messages,
       ],
+      stream: true,
     });
 
-    const aiResponse = response.choices[0].message.content;
-    res.status(200).json({ message: aiResponse });
+    const stream = OpenAIStream(response);
+    return new StreamingTextResponse(stream);
   } catch (error) {
     console.error("Error calling OpenAI API:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while processing your request." });
+    return new Response("An error occurred while processing your request.", {
+      status: 500,
+    });
   }
 }
